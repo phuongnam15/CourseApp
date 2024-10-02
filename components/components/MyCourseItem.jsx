@@ -1,3 +1,4 @@
+import { useGlobalState } from "@/context/globalContext";
 import {
   Badge,
   BadgeIcon,
@@ -15,45 +16,68 @@ import {
 import { useRouter } from "expo-router";
 import { Flame, User } from "lucide-react-native";
 import React from "react";
-import { StyleSheet } from "react-native";
+import { StyleSheet, TouchableOpacity } from "react-native";
 
-const MyCourseItem = () => {
+const MyCourseItem = ({
+  avatar,
+  title,
+  author,
+  totalLearn,
+  totalLessons,
+  data,
+}) => {
+  const { setIdLesson, setGlobalState } = useGlobalState();
   const router = useRouter();
   return (
-    <View style={styles.myCourseContainer}>
+    <TouchableOpacity
+      onPress={() => {
+        setGlobalState({
+          id: data?.course?.id,
+        });
+        router.push(`/CourseInfo`);
+      }}
+      style={styles.myCourseContainer}
+    >
       <Box display="flex" flexDirection="row" alignItems="flex-start">
         <Image
           source={{
-            uri: "https://glints.com/vn/blog/wp-content/uploads/2022/08/Google-Digital-Marketing-khoa%CC%81-ho%CC%A3c-free.jpeg",
+            uri: avatar,
           }}
           alt="coverImg"
           style={styles.myCourseImg}
         />
-        <Box ml={10}>
+        <Box
+          display="flex"
+          flexDirection="column"
+          justifyContent="flex-start"
+          ml={10}
+        >
           <Text
-            fontSize={16}
+            fontSize={14}
             fontWeight="bold"
             textTransform="uppercase"
-            // fontFamily="Poppins_600SemiBold"
+            ellipsizeMode="tail"
+            numberOfLines={2}
             style={{
-              lineHeight: 35 * 0.75,
-              paddingTop: 35 - 35 * 0.75,
+              // lineHeight: 35 * 0.75,
+              // paddingTop: 35 - 35 * 0.75,
               fontWeight: "bold",
+              // width: 280,
+              width: 200,
             }}
           >
-            Khoá học lùa gà
+            {title}
           </Text>
           <Box display="flex" flexDirection="row" alignItems="center">
             <Icon as={User} size="xs" color="#6c757d" />
             <Text
-              // fontFamily="Poppins_400Regular"
               style={{
                 fontSize: 12,
                 marginLeft: 5,
                 color: "#6c757d",
               }}
             >
-              Phan Lâm
+              {author}
             </Text>
           </Box>
           <Badge
@@ -62,6 +86,10 @@ const MyCourseItem = () => {
             variant="solid"
             borderRadius="$lg"
             action="error"
+            width={120}
+            direction="flex"
+            alignItems="center"
+            justifyContent="center"
           >
             <BadgeIcon as={Flame} mr="$2" />
             <BadgeText>Best Seller</BadgeText>
@@ -70,7 +98,6 @@ const MyCourseItem = () => {
       </Box>
       <Box mt={6}>
         <Text
-          // fontFamily="Poppins_600SemiBold"
           style={{
             fontSize: 14,
             color: "#6c757d",
@@ -87,16 +114,14 @@ const MyCourseItem = () => {
           alignItems="center"
         >
           <Text
-            // fontFamily="Poppins_600SemiBold"
             style={{
               fontWeight: "bold",
               fontSize: 14,
             }}
           >
-            20 / 29 lessons
+            {totalLearn} / {totalLessons} lessons
           </Text>
           <Text
-            // fontFamily="Poppins_600SemiBold"
             style={{
               fontWeight: "bold",
               fontSize: 14,
@@ -106,13 +131,24 @@ const MyCourseItem = () => {
           </Text>
         </Box>
         <Box mt={10}>
-          <Progress value={Math.floor((20 / 29) * 100)} h="$2" size="sm">
-            <ProgressFilledTrack bg="#69b4ff" />
+          <Progress
+            value={Math.floor((totalLearn / totalLessons) * 100)}
+            h="$2"
+            size="sm"
+          >
+            <ProgressFilledTrack bg="#2E8B57" />
           </Progress>
         </Box>
         <Button
-          onPress={() => {
-            router.push('/lessonDetails/')
+          onPress={(e) => {
+            e.stopPropagation();
+            if (totalLearn !== 0) {
+              setIdLesson(data.course.lessions[totalLearn - 1].id);
+              router.push(`/lessonDetails/`);
+            }else{
+              setIdLesson(data.course.lessions[0].id);
+              router.push(`/lessonDetails/`);
+            }
           }}
           mt={15}
           size="md"
@@ -120,12 +156,12 @@ const MyCourseItem = () => {
           action="primary"
           isDisabled={false}
           isFocusVisible={false}
-          borderColor="#69b4ff"
+          borderColor="#2E8B57"
         >
-          <ButtonText color="#69b4ff">Bắt đầu học </ButtonText>
+          <ButtonText color="#2E8B57">Bắt đầu học </ButtonText>
         </Button>
       </Box>
-    </View>
+    </TouchableOpacity>
   );
 };
 const styles = StyleSheet.create({

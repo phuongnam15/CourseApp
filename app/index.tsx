@@ -1,24 +1,13 @@
 import {
-  Box,
-  Icon,
-  Image,
-  Input,
-  InputField,
-  ScrollView,
-  Text,
-  View,
+  View
 } from "@gluestack-ui/themed";
-import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
-import { Search } from "lucide-react-native";
 import React, { useState } from "react";
 import { Dimensions, Platform, StyleSheet } from "react-native";
-import Carousel, {
+import {
   Pagination,
   ParallaxImage,
 } from "react-native-snap-carousel";
-import CategoriresItem from "../components/components/CategoriesItem";
-import Course from "../components/components/Course";
 
 const { width: screenWidth } = Dimensions.get("window");
 export default function Home() {
@@ -84,17 +73,17 @@ export default function Home() {
   //   router.push('/tabs/(tabs)/')
   // },[])
   return (
-    <View style={{ backgroundColor: "#69b4ff" }}>
+    <View style={{ backgroundColor: "#2E8B57" }}>
       {/* <ScrollView
         style={{
-          marginTop: 60,
+          marginTop: 45,
           backgroundColor: "#f7f7f7",
         }}
       >
         <View style={{ backgroundColor: "#f7f7f7" }}>
           <View
             style={{
-              backgroundColor: "#69b4ff",
+              backgroundColor: "#2E8B57",
               borderBottomLeftRadius: 30,
               borderBottomRightRadius: 30,
               paddingBottom: 20,
@@ -112,14 +101,12 @@ export default function Home() {
             >
               <Box display="flex" flexDirection="column">
                 <Text
-                  // fontFamily="Poppins_700Bold"
                   color="#fff"
                   style={{ fontWeight: "bold", fontSize: 18 }}
                 >
                   Good Morning, Đatprs
                 </Text>
                 <Text
-                  // fontFamily="Poppins_400Regular_Italic"
                   style={{
                     fontStyle: "italic",
                     fontSize: 14,
@@ -221,13 +208,11 @@ export default function Home() {
               marginTop={20}
             >
               <Text
-                // fontFamily="Poppins_700Bold"
                 style={{ fontSize: 18, fontWeight: "bold" }}
               >
                 Danh mục
               </Text>
               <Text
-                // fontFamily="Poppins_400Regular"
                 style={{
                   fontSize: 14,
                   fontWeight: "bold",

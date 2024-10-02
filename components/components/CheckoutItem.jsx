@@ -2,14 +2,15 @@ import { Box, Icon, Image, Text } from "@gluestack-ui/themed";
 import { PlayCircle } from "lucide-react-native";
 import React from "react";
 import { StyleSheet } from "react-native";
+import { formatCurrency } from "./Course";
 
-const CheckoutItem = () => {
+const CheckoutItem = ({data}) => {
   return (
     <Box style={styles.checkoutContainer}>
       <Box position="relative">
         <Image
           source={{
-            uri: "https://glints.com/vn/blog/wp-content/uploads/2022/08/Google-Digital-Marketing-khoa%CC%81-ho%CC%A3c-free.jpeg",
+            uri: data?.course?.image?.url,
           }}
           alt="checkoutImg"
           style={styles.checkoutImg}
@@ -18,25 +19,26 @@ const CheckoutItem = () => {
       </Box>
       <Box style={{ marginLeft: 5 }}>
         <Text
-          fontSize={18}
+          isTruncated
+          // fontSize={18}
+          size="sm"
           fontWeight="bold"
           textTransform="uppercase"
-          // fontFamily="Poppins_600SemiBold"
           style={{
             lineHeight: 35 * 0.75,
             paddingTop: 35 - 35 * 0.75,
+            width: 300
           }}
         >
-          Lùa gà Đại pháp
+          {data?.course?.name}
         </Text>
         <Text
-          // fontFamily="Poppins_600SemiBold"
           style={{
             fontSize: 16,
-            color: "#56b7ea",
+            color: "#61bc84",
           }}
         >
-          299.999đ
+         {formatCurrency(data?.course?.is_promote === 1 ? Number(data?.course?.promote_price) : Number(data?.course?.price))}
         </Text>
       </Box>
     </Box>

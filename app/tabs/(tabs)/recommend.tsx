@@ -1,172 +1,111 @@
+import { sendGet } from "@/api/axiosClient";
+import CreateActionSheet from "@/components/components/ActionSheet/CreateActionSheet";
+import CreateGroupModal from "@/components/components/ActionSheet/CreateGroupModal";
+import SearchGroupModal from "@/components/components/ActionSheet/SearchGroupModal";
+import GroupCategory from "@/components/components/Group/GroupCategory";
+import AnalystGroup from "@/components/components/Group/Tabs/AnalystGroup";
+import GroupFeeds from "@/components/components/Group/Tabs/GroupFeeds";
+import MyGroups from "@/components/components/Group/Tabs/MyGroups";
+import { Icon, Text, View } from "@gluestack-ui/themed";
+import { BadgePlus, Search } from "lucide-react-native";
+import React, { useEffect, useState } from "react";
+import { TouchableOpacity } from "react-native";
 import {
-  Badge,
-  BadgeText,
-  Box,
-  Button,
-  ButtonIcon,
-  Icon,
-  Input,
-  InputField,
-  ScrollView,
-  Text,
-  VStack,
-  View,
-} from "@gluestack-ui/themed";
-import React from "react";
-import { LinearGradient } from "expo-linear-gradient";
-import { Search, ShoppingCart } from "lucide-react-native";
-import { StyleSheet, TouchableOpacity } from "react-native";
-import WhishlistItem from "@/components/components/WishlistItem";
-import { useRouter } from "expo-router";
+  SafeAreaView,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
 const recommend = () => {
-  const router = useRouter();
+  const [showActionsheet, setShowActionsheet] = React.useState(false);
+  const [activeTab, setActiveTab] = useState(0);
+  const [createModal, setCreateModal] = React.useState(false);
+  const [searchModal, setSearchModal] = React.useState(false);
+  const handleClose = () => setShowActionsheet(false);
+  const insets = useSafeAreaInsets();
+  const [groupList, setGroupList] = React.useState([]);
+  const handleGetListGroup = async () => {
+    try {
+      const res: any = await sendGet("/user/group");
+      if (res.success === true) {
+        setGroupList(res?.data?.data);
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  };
+  useEffect(() => {
+    handleGetListGroup();
+  }, []);
   return (
-    <View
-      style={{backgroundColor: '#69b4ff'}}
+    <SafeAreaView
+      style={{
+        backgroundColor: "#fff",
+        flex: 1,
+        paddingBottom: -insets.bottom,
+      }}
     >
-      <ScrollView
-        style={{
-          marginTop: 60,
-        }}
+      <View
+        borderBottomColor="#cbd5e1"
+        backgroundColor="#fff"
+        borderBottomWidth={0.5}
+        pb={10}
       >
-        <View style={{ backgroundColor: "#f7f7f7" }}>
+        <View px={20}>
           <View
-            style={{
-              backgroundColor: '#69b4ff',
-              borderBottomLeftRadius: 30,
-              borderBottomRightRadius: 30,
-              paddingBottom: 20,
-            }}
+            display="flex"
+            justifyContent="space-between"
+            alignItems="center"
+            position="relative"
+            flexDirection="row"
           >
-            <Box
-              display="flex"
-              flexDirection="row"
-              justifyContent="space-between"
-              alignItems="center"
-              style={{
-                paddingLeft: 30,
-                paddingRight: 30,
-              }}
-            >
-              <Box display="flex" flexDirection="column">
-                <Text
-                  // fontFamily="Poppins_700Bold"
-                  color="#fff"
-                  style={{
-                    fontWeight: "bold",
-                    fontSize: 24,
-                    lineHeight: 35 * 0.75,
-                    paddingTop: 35 - 35 * 0.75,
-                  }}
-                >
-                  Khoá học yêu thích
-                </Text>
-                {/* <Text
-                fontFamily="Poppins_400Regular_Italic"
-                style={{
-                  fontStyle: "italic",
-                  fontSize: 14,
+            <Text fontWeight="$bold" fontSize="$xl">
+              Nhóm
+            </Text>
+            <View display="flex" flexDirection="row" gap={5}>
+              <TouchableOpacity
+                onPress={() => {
+                  setShowActionsheet(true);
                 }}
-                color="#fff"
               >
-                Let's start learning!
-              </Text> */}
-              </Box>
-              <VStack>
-                <Badge
-                  h={23}
-                  w={23}
-                  bg="$red600"
-                  borderRadius="$full"
-                  mb={-14}
-                  mr={-5}
-                  zIndex={1}
-                  variant="solid"
-                  alignSelf="flex-end"
-                >
-                  <BadgeText color="$white">2</BadgeText>
-                </Badge>
-                <Button
-                  onPress={() => {
-                    router.push("/Checkout/");
-                  }}
-                  borderRadius="$full"
-                  size="lg"
-                  p={1}
-                  paddingHorizontal={15}
-                  bg="#56b7ea"
-                  borderColor="#56b7ea"
-                >
-                  <ButtonIcon as={ShoppingCart} />
-                </Button>
-              </VStack>
-            </Box>
-            <Box
-              display="flex"
-              flexDirection="row"
-              justifyContent="center"
-              alignItems="center"
-            >
-              <Box
-                style={{
-                  marginTop: 10,
-                  borderRadius: 20,
-                  backgroundColor: "#fff",
-                  width: "85%",
-                  paddingHorizontal: 20,
+                <Icon as={BadgePlus} size="xl" />
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => {
+                  setSearchModal(true);
                 }}
-                display="flex"
-                flexDirection="row"
-                alignItems="center"
               >
                 <Icon as={Search} size="xl" />
-                <Input
-                  variant="outline"
-                  size="md"
-                  style={{
-                    width: "90%",
-                    borderRadius: 20,
-                    marginLeft: 5,
-                    borderWidth: 0,
-                  }}
-                  isDisabled={false}
-                  isInvalid={false}
-                  isReadOnly={false}
-                >
-                  <InputField
-                    // id="username"
-                    // value={formData.username}
-                    // onChangeText={(e) => {
-                    //   handleChange("username", e);
-                    // }}
-                    placeholder="Search for anything ..."
-                  />
-                </Input>
-              </Box>
-            </Box>
+              </TouchableOpacity>
+            </View>
           </View>
+          <GroupCategory onSubmit={setActiveTab} />
         </View>
-        <View
-          style={{
-            width: "100%",
-            height: "100%",
-            backgroundColor: "#f7f7f7",
-            paddingTop: 30,
-            paddingLeft: 10,
-            paddingRight: 10,
-            paddingBottom: 40,
-          }}
-        >
-          <View rowGap={15} >
-            <WhishlistItem />
-            <WhishlistItem />
-            <WhishlistItem />
-            <WhishlistItem />
-          </View>
-        </View>
-      </ScrollView>
-    </View>
+      </View>
+      {(activeTab === 0 && <GroupFeeds groupList={groupList} />) ||
+        (activeTab === 2 && <MyGroups />) ||
+        (activeTab === 1 && <AnalystGroup />)}
+      <CreateGroupModal
+        showModal={createModal}
+        handleClose={() => {
+          setCreateModal(false);
+        }}
+      />
+      <SearchGroupModal
+        showModal={searchModal}
+        listGroup={groupList}
+        handleClose={() => {
+          setSearchModal(false);
+        }}
+      />
+      <CreateActionSheet
+        handleCreateGroup={() => {
+          setShowActionsheet(false);
+          setCreateModal(true);
+        }}
+        showActionsheet={showActionsheet}
+        handleClose={handleClose}
+        handleCreatePost={() => {}}
+      />
+    </SafeAreaView>
   );
 };
-const styles = StyleSheet.create({});
 export default recommend;

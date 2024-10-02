@@ -7,7 +7,7 @@ export default function EditScreenInfo({ path }: { path: string }) {
   return (
     <Box>
       <Box alignItems="center" marginHorizontal="$4">
-        <Text fontFamily="Poppins_400Regular"
+        <Text 
           textAlign="center"
           $light-color="rgba(0,0,0,0.8)"
           $dark-color="rgba(255,255,255,0.8)"
@@ -20,7 +20,7 @@ export default function EditScreenInfo({ path }: { path: string }) {
           marginVertical="$2"
           bg="$backgroundDark200"
         >
-          <Text fontFamily="Poppins_400Regular"
+          <Text 
             fontSize="$sm"
             lineHeight="$sm"
             textAlign="center"
@@ -30,7 +30,7 @@ export default function EditScreenInfo({ path }: { path: string }) {
           </Text>
         </Box>
 
-        <Text fontFamily="Poppins_400Regular"
+        <Text 
           textAlign="center"
           $light-color="rgba(0,0,0,0.8)"
           $dark-color="rgba(255,255,255,0.8)"
@@ -45,7 +45,7 @@ export default function EditScreenInfo({ path }: { path: string }) {
           style={{ paddingVertical: 15 }}
           href="https://docs.expo.io/get-started/create-a-new-app/#opening-the-app-on-your-phonetablet"
         >
-          <Text fontFamily="Poppins_400Regular" textAlign="center">
+          <Text  textAlign="center">
             Tap here if your app doesn't automatically update after making
             changes
           </Text>

@@ -6,20 +6,17 @@ import { Dimensions, StyleSheet } from "react-native";
 const { width: screenWidth } = Dimensions.get("window");
 const Item = ({ item, index }) => {
   return (
-    <View
-      style={styles.edit_item}
-      // style={index % 2 == 0 ? styles.item : styles.extra_item}
-    >
+    <View style={styles.edit_item}>
       <Image
         source={{ uri: item.thumbnail }}
         style={styles.image}
         alt="category image"
+        marginBottom={10}
       />
       <Text
-        // fontFamily="Poppins_600SemiBold"
+        numberOfLines={2}
+        ellipsizeMode="tail"
         style={{
-          // marginTop: 5,
-          // color: index % 2 == 0 ? "#26A69A" : "#f5be0b",
           fontWeight: "bold",
         }}
       >
@@ -31,7 +28,6 @@ const Item = ({ item, index }) => {
 const CategoriesItem = ({ data }) => {
   const [entries, setEntries] = useState([]);
   const [isLoading, setIsloading] = useState(true);
-
   useEffect(() => {
     if (data) {
       const convertItem = data?.map((item) => {
@@ -55,38 +51,42 @@ const CategoriesItem = ({ data }) => {
           <Skeleton width={200} height={50} />
         </Box>
       ) : (
-        <FlatList
-          data={entries}
-          renderItem={renderItem}
-          keyExtractor={(item, index) => index.toString()}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          scrollEnabled={true}
-          contentContainerStyle={{
-            marginTop: 10,
-          }}
-          style={{ marginLeft: 5 }}
-        />
+        <>
+       
+          <FlatList
+            data={entries}
+            renderItem={renderItem}
+            keyExtractor={(item, index) => index.toString()}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            scrollEnabled={true}
+            contentContainerStyle={{
+              marginTop: 10,
+            }}
+            style={{ marginLeft: 5 }}
+          />
+        </>
       )}
     </Box>
   );
 };
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    // flex: 1,
     justifyContent: "center",
-    alignItems: "center",
+    // alignItems: "center",
   },
   edit_item: {
     display: "flex",
-    flexDirection: "row",
+    flexDirection: "column",
     alignItems: "center",
-    justifyContent: "center",
+    // justifyContent: "center",
     backgroundColor: "#fff",
     paddingHorizontal: 10,
     paddingVertical: 10,
-    borderRadius: 30,
-    marginRight: 5,
+    borderRadius: 10,
+    marginRight: 10,
+    width: 150,
   },
   item: {
     width: 100,
@@ -111,10 +111,11 @@ const styles = StyleSheet.create({
   image: {
     resizeMode: "cover",
     objectFit: "cover",
-    width: 30,
-    height: 30,
-    borderRadius: 50,
-    marginRight: 5,
+    width: "100%",
+    height: 80,
+    borderRadius: 10,
+    marginHorizontal: "auto",
+    // marginRight: 5,
     // marginTop: 20,
   },
 });

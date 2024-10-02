@@ -1,31 +1,23 @@
+import { sendGet } from "@/api/axiosClient";
+import DefaultHeader from "@/components/components/Header/DefaultHeader";
 import {
-  Badge,
-  BadgeText,
   Box,
-  Button,
-  ButtonIcon,
-  Icon,
-  Input,
-  InputField,
-  ScrollView,
+  FlatList,
   Text,
-  View,
+  View
 } from "@gluestack-ui/themed";
-import { useRouter } from "expo-router";
-import { Search, ShoppingCart } from "lucide-react-native";
 import React, { useEffect, useState } from "react";
 import { Dimensions, Platform, StyleSheet } from "react-native";
+import { SafeAreaView, useSafeArea, useSafeAreaInsets } from "react-native-safe-area-context";
 import Carousel, {
   Pagination,
   ParallaxImage,
 } from "react-native-snap-carousel";
 import CategoriresItem from "../../../components/components/CategoriesItem";
 import Course from "../../../components/components/Course";
-import { sendGet } from "@/api/axiosClient";
 
 const { width: screenWidth } = Dimensions.get("window");
 export default function Home() {
-  const router = useRouter();
   const [activeSlide, setActiveSlide] = useState(0);
   const [categoryList, setCategoryList] = useState([]);
   const [entries, setEntries] = useState([]);
@@ -45,30 +37,8 @@ export default function Home() {
       </View>
     );
   };
-  const pagination = () => {
-    return (
-      <Pagination
-        dotsLength={entries.length}
-        activeDotIndex={activeSlide}
-        containerStyle={{ paddingVertical: 15 }}
-        dotStyle={{
-          width: 10,
-          height: 10,
-          borderRadius: 5,
-          marginHorizontal: 4,
-          backgroundColor: "rgba(0, 0, 0, 0.92)",
-        }}
-        dotColor="#794A86"
-        inactiveDotColor="rgba(0, 0, 0, 0.92)"
-        inactiveDotStyle={
-          {
-            // Define styles for inactive dots here
-          }
-        }
-        inactiveDotOpacity={0.4}
-        inactiveDotScale={0.6}
-      />
-    );
+  const renderCategory = ({ item, index }: { item: any; index: number }) => {
+    return <Course key={index} data={item} />;
   };
   const handleGetBanner = async () => {
     try {
@@ -96,165 +66,68 @@ export default function Home() {
     handleGetBanner();
     handleGetCategory();
   }, []);
+  const insets = useSafeAreaInsets()
   return (
-    <View style={{ backgroundColor: "#69b4ff" }}>
-      <ScrollView
+    <SafeAreaView
+      style={{ backgroundColor: "#2E8B57", flex: 1, display: "flex", paddingBottom: -insets.bottom}}
+    >
+      <DefaultHeader />
+      <View
         style={{
-          marginTop: 60,
+          backgroundColor: "#f7f7f7",
+          paddingTop: 30,
+          paddingLeft: 10,
+          paddingRight: 10,
+          paddingBottom: 10,
+          flex: 1,
         }}
       >
-        <View style={{ backgroundColor: "#f7f7f7" }}>
-          <View
-            style={{
-              backgroundColor: "#69b4ff",
-              borderBottomLeftRadius: 30,
-              borderBottomRightRadius: 30,
-              paddingBottom: 20,
-            }}
+        <Carousel
+          sliderWidth={screenWidth - 20}
+          itemWidth={screenWidth - 20}
+          data={entries}
+          renderItem={renderItem}
+          hasParallaxImages={true}
+          vertical={false}
+          loop={true} // Thêm prop loop
+          autoplay={true} // Thêm prop autoplay
+          autoplayInterval={3000} // Thời gian giữa các slide trong autoplay (nếu cần)
+          onSnapToItem={(index) => setActiveSlide(index)}
+        />
+        <View>
+          <Box
+            display="flex"
+            justifyContent="space-between"
+            alignItems="center"
+            flexDirection="row"
+            marginTop={10}
           >
-            <Box
-              display="flex"
-              flexDirection="row"
-              justifyContent="space-between"
-              alignItems="center"
+            <Text style={{ fontSize: 18, fontWeight: "bold" }}>Danh mục</Text>
+            <Text
               style={{
-                paddingLeft: 30,
-                paddingRight: 30,
+                fontSize: 14,
+                fontWeight: "bold",
+                borderBottomWidth: 0.5,
               }}
             >
-              <Box display="flex" flexDirection="column">
-                <Text color="#fff" style={{ fontWeight: "bold", fontSize: 18 }}>
-                  Good Morning, Đatprs
-                </Text>
-                <Text
-                  style={{
-                    fontStyle: "italic",
-                    fontSize: 14,
-                  }}
-                  color="#fff"
-                >
-                  Let's start learning!
-                </Text>
-              </Box>
-              <Box>
-                <Badge
-                  h={23}
-                  w={23}
-                  bg="$red600"
-                  borderRadius="$full"
-                  mb={-14}
-                  mr={-5}
-                  zIndex={1}
-                  variant="solid"
-                  alignSelf="flex-end"
-                >
-                  <BadgeText color="$white">2</BadgeText>
-                </Badge>
-                <Button
-                  onPress={() => {
-                    router.push("/Checkout/");
-                  }}
-                  borderRadius="$full"
-                  size="lg"
-                  p={1}
-                  paddingHorizontal={15}
-                  bg="#56b7ea"
-                  borderColor="#56b7ea"
-                >
-                  <ButtonIcon as={ShoppingCart} />
-                </Button>
-              </Box>
-            </Box>
-            <Box
-              display="flex"
-              flexDirection="row"
-              justifyContent="center"
-              alignItems="center"
-            >
-              <Box
-                style={{
-                  marginTop: 10,
-                  borderRadius: 20,
-                  backgroundColor: "#fff",
-                  width: "85%",
-                  paddingHorizontal: 20,
-                }}
-                display="flex"
-                flexDirection="row"
-                alignItems="center"
-              >
-                <Icon as={Search} size="xl" />
-                <Input
-                  variant="outline"
-                  size="md"
-                  style={{
-                    width: "90%",
-                    borderRadius: 20,
-                    marginLeft: 5,
-                    borderWidth: 0,
-                  }}
-                  isDisabled={false}
-                  isInvalid={false}
-                  isReadOnly={false}
-                >
-                  <InputField placeholder="Search for anything ..." />
-                </Input>
-              </Box>
-            </Box>
-          </View>
+              Xem tất cả
+            </Text>
+          </Box>
+          <CategoriresItem data={categoryList} />
+          <FlatList
+              data={categoryList?.filter((arg: any) => arg.total_courses > 0)}
+              renderItem={renderCategory}
+              keyExtractor={(item, index) => index.toString()}
+              // horizontal
+              // showsHorizontalScrollIndicator={false}
+              scrollEnabled={true}
+              contentContainerStyle={{
+                marginTop: 10,
+              }}
+            />
         </View>
-        <View
-          style={{
-            width: "100%",
-            backgroundColor: "#f7f7f7",
-            paddingTop: 30,
-            paddingLeft: 10,
-            paddingRight: 10,
-            paddingBottom: 40,
-          }}
-        >
-          <Carousel
-            sliderWidth={screenWidth - 20}
-            itemWidth={screenWidth - 20}
-            data={entries}
-            renderItem={renderItem}
-            hasParallaxImages={true}
-            vertical={false}
-            loop={true} // Thêm prop loop
-            autoplay={true} // Thêm prop autoplay
-            autoplayInterval={3000} // Thời gian giữa các slide trong autoplay (nếu cần)
-            onSnapToItem={(index) => setActiveSlide(index)}
-          />
-          {/* {pagination()} */}
-          <View>
-            <Box
-              display="flex"
-              justifyContent="space-between"
-              alignItems="center"
-              flexDirection="row"
-              marginTop={20}
-            >
-              <Text style={{ fontSize: 18, fontWeight: "bold" }}>Danh mục</Text>
-              <Text
-                style={{
-                  fontSize: 14,
-                  fontWeight: "bold",
-                  borderBottomWidth: 0.5,
-                }}
-              >
-                Xem tất cả
-              </Text>
-            </Box>
-            <CategoriresItem data={categoryList} />
-            {categoryList
-              ?.filter((arg: any) => arg.total_courses > 0)
-              .map((item, index) => (
-                <Course key={index} data={item} />
-              ))}
-          </View>
-        </View>
-      </ScrollView>
-    </View>
+      </View>
+    </SafeAreaView>
   );
 }
 const styles = StyleSheet.create({

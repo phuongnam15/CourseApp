@@ -1,4 +1,4 @@
-import { sendGet } from "@/api/axiosClient";
+import { sendPost } from "@/api/axiosClient";
 import { useGlobalState } from "@/context/globalContext";
 import {
   Badge,
@@ -12,19 +12,16 @@ import {
   Image,
   Text,
   View,
+  useToast,
 } from "@gluestack-ui/themed";
-import { useRouter } from "expo-router";
-import { Flame, Heart, Star, User } from "lucide-react-native";
-import React, { useContext, useEffect, useState } from "react";
-import {
-  Dimensions,
-  Platform,
-  StyleSheet,
-  TouchableOpacity,
-} from "react-native";
-const { width: screenWidth } = Dimensions.get("window");
 import { Skeleton } from "@rneui/themed";
-function formatCurrency(number) {
+import { useRouter } from "expo-router";
+import { Flame, ShoppingCart, Star, User } from "lucide-react-native";
+import React, { useEffect, useState } from "react";
+import { Dimensions, StyleSheet, TouchableOpacity } from "react-native";
+import Notification from "./Notification";
+const { width: screenWidth } = Dimensions.get("window");
+export function formatCurrency(number) {
   return number.toLocaleString("vi-VN", {
     style: "currency",
     currency: "VND",
@@ -32,13 +29,72 @@ function formatCurrency(number) {
 }
 export const CourseItem = ({ item }) => {
   const router = useRouter();
-  const { setGlobalState } = useGlobalState();
+  const { setGlobalState, setCartList, isLogin, myCourseList } =
+    useGlobalState();
   const [isLoading, setIsloading] = useState(true);
+  const toast = useToast();
   useEffect(() => {
     if (item && Object.keys(item).length !== 0) {
       setIsloading(false);
     }
   }, [item]);
+  const handleAddCart = async () => {
+    try {
+      if (isLogin) {
+        const res = await sendPost(`/user/cart`, {
+          course_id: item?.id,
+        });
+        if (res.success === true) {
+          setCartList((prevState) => [...prevState, res.data.data]);
+          toast.show({
+            placement: "top",
+            render: ({ id }) => {
+              const toastId = "toast-" + id;
+              return (
+                <Notification
+                  id={toastId}
+                  description="Thêm vào giỏ hàng thành công"
+                  color="success"
+                  title="Thành công"
+                />
+              );
+            },
+          });
+        }
+      } else {
+        toast.show({
+          placement: "top",
+          render: ({ id }) => {
+            const toastId = "toast-" + id;
+            return (
+              <Notification
+                id={toastId}
+                description="Bạn cần đăng nhập để tiếp tục"
+                color="error"
+                title="Lỗi"
+              />
+            );
+          },
+        });
+      }
+    } catch (err) {
+      console.log(err);
+      toast.show({
+        placement: "top",
+        render: ({ id }) => {
+          const toastId = "toast-" + id;
+          return (
+            <Notification
+              id={toastId}
+              description={err?.response?.data?.error_msg}
+              color="error"
+              title="Lỗi"
+            />
+          );
+        },
+      });
+    }
+  };
   return (
     <>
       {isLoading ? (
@@ -62,45 +118,61 @@ export const CourseItem = ({ item }) => {
             <Text style={{ fontSize: 12, fontWeight: "bold" }}>4.9</Text>
             <Icon color="#ffc107" size="xs" ml={1} as={Star} />
           </Box>
-          <Button
+          {/* <Button
             style={styles.likeButton}
             borderRadius="$full"
             size="sm"
             padding={10}
             paddingHorizontal={10}
-            bg="#e1ffff"
-            borderColor="#e1ffff"
+            bg="#c6ffe6"
+            borderColor="#c6ffe6"
           >
-            <ButtonIcon as={Heart} color="#006fff" />
-          </Button>
+            <ButtonIcon as={Heart} color="#2E8B57" />
+          </Button> */}
+          {!myCourseList?.map((item) => item.course.id).includes(item.id) && (
+            <Button
+              style={styles.cartButton}
+              borderRadius="$full"
+              size="sm"
+              padding={10}
+              paddingHorizontal={10}
+              bg="#c6ffe6"
+              borderColor="#c6ffe6"
+              onPress={handleAddCart}
+            >
+              <ButtonIcon as={ShoppingCart} color="#2E8B57" />
+            </Button>
+          )}
           <Image
             source={{ uri: item?.image?.url }}
             style={styles.image}
             alt="category image"
           />
           <Text
-            fontFamily="Poppins_600SemiBold"
             style={{
               marginTop: 5,
               fontWeight: "bold",
-              fontSize: 16,
+              fontSize: 14,
               marginLeft: 10,
+              marginRight: 10
             }}
+            marginBottom={5}
             numberOfLines={2}
           >
             {item?.name}
           </Text>
           <Box
             marginLeft={10}
+            marginRight={10}
+            marginBottom={5}
             display="flex"
             flexDirection="row"
             alignItems="center"
           >
             <Icon as={User} size="xs" color="#6c757d" />
             <Text
-              // fontFamily="Poppins_400Regular"
               style={{
-                fontSize: 12,
+                fontSize: 10,
                 marginLeft: 3,
                 color: "#6c757d",
               }}
@@ -111,18 +183,21 @@ export const CourseItem = ({ item }) => {
 
           <Box
             marginLeft={10}
+            marginRight={10}
             display="flex"
             flexDirection="row"
             alignItems="center"
           >
             <Text
-              // fontFamily="Poppins_600SemiBold"
               style={{
                 fontSize: 16,
-                color: "#56b7ea",
+                fontWeight: "bold",
+                color: "#61bc84",
               }}
             >
-              {formatCurrency(item?.promote_price)}
+              {formatCurrency(item?.is_promote == 0
+                          ? item?.price
+                          : item?.promote_price)}
             </Text>
             <Badge
               ml={3}
@@ -147,7 +222,8 @@ const Course = ({ data }) => {
     return (
       <View
         style={{
-          width: screenWidth / 2,
+          // width: screenWidth / 2,
+          width: 280,
           marginRight: 15,
           alignItems: "stretch",
         }}
@@ -157,35 +233,6 @@ const Course = ({ data }) => {
     );
   };
 
-  // const handleGetListCourse = async () => {
-  //   try {
-  //     const input = {
-  //       category_id: data?.id,
-  //     };
-  //     const res = await sendGet("/user/course");
-  //     setIsloading(false);
-  //     setListCourse(
-  //       res?.data?.data?.map((item) => {
-  //         return {
-  //           id: item?.id,
-  //           thumbnail:
-  //             "https://glints.com/vn/blog/wp-content/uploads/2022/08/Google-Digital-Marketing-khoa%CC%81-ho%CC%A3c-free.jpeg",
-  //           text: item?.name,
-  //           author: item?.user_name,
-  //           description: "20 bài",
-  //           price: formatCurrency(item?.price),
-  //         };
-  //       })
-  //     );
-  //   } catch (err) {
-  //     console.log(err);
-  //   }
-  // };
-  // useEffect(() => {
-  //   if (data) {
-  //     handleGetListCourse();
-  //   }
-  // }, [data]);
   useEffect(() => {
     if (data) {
       setListCourse(data?.courses);
@@ -203,15 +250,9 @@ const Course = ({ data }) => {
         {isLoading ? (
           <Skeleton width={100} height={15} />
         ) : (
-          <Text
-            // fontFamily="Poppins_700Bold"
-            style={{ fontSize: 18, fontWeight: "bold" }}
-          >
-            {data?.name}
-          </Text>
+          <Text style={{ fontSize: 18, fontWeight: "bold" }}>{data?.name}</Text>
         )}
         <Text
-          // fontFamily="Poppins_400Regular"
           style={{ fontSize: 14, fontWeight: "bold", borderBottomWidth: 0.5 }}
         >
           Xem tất cả
@@ -274,13 +315,21 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     zIndex: 10,
   },
+  cartButton: {
+    position: "absolute",
+    top: 10,
+    // right: 50,
+    right: 10,
+    borderRadius: 10,
+    zIndex: 10,
+  },
   image: {
     resizeMode: "cover",
     objectFit: "cover",
     width: "100%",
-    borderTopLeftRadius: 10,
-    borderTopRightRadius: 10,
-    // borderRadius: 10,
+    // borderTopLeftRadius: 10,
+    // borderTopRightRadius: 10,
+    borderRadius: 10,
     height: 120,
   },
   content: {

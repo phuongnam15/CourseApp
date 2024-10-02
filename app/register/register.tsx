@@ -15,6 +15,7 @@ import { CircleUser, Lock, Mail, Phone } from "lucide-react-native";
 import { useState } from "react";
 import { sendPost } from "../../api/axiosClient";
 import Notification from "@/components/components/Notification";
+import { SafeAreaView } from "react-native-safe-area-context";
 export default function Home() {
   const router = useRouter();
   const [disableButton, setDisableButton] = useState(false);
@@ -79,208 +80,202 @@ export default function Home() {
         style={{ backgroundColor: "#f7f7f7", marginBottom: 20, height: "100%" }}
         contentContainerStyle={{ flexGrow: 1 }}
       >
-        <Box
-          style={{ marginTop: 40 }}
-          display="flex"
-          justifyContent="center"
-          alignItems="center"
-        >
-          <Image
-            size="md"
-            style={{
-              width: "80%",
-              height: 200,
-            }}
-            alt="loginImg"
-            source={require("../../assets/images/loginImage.png")}
-          />
-        </Box>
-        <Box display="flex" justifyContent="center" alignItems="center">
-          <Text
-            // fontFamily="Poppins_400Regular"
-            style={{
-              fontWeight: "bold",
-              fontSize: 30,
-              lineHeight: 40 * 0.75,
-              paddingTop: 40 - 35 * 0.75,
-              textTransform: "uppercase",
-              color: "#230B41",
-            }}
-          >
-            Đăng ký
-          </Text>
-          <Text 
-          // fontFamily="Poppins_400Regular"
-          >
-            Đã có tài khoản?{" "}
-            <Link href={"/login/"} style={{ fontWeight: "bold" }}>
-              {" "}
-              Đăng nhập
-            </Link>
-          </Text>
-        </Box>
-        <Box
-          style={{ marginTop: 40 }}
-          display="flex"
-          flexDirection="row"
-          justifyContent="center"
-          alignItems="center"
-        >
-          <Icon as={CircleUser} size="xl" />
-          <Input
-            variant="outline"
-            size="md"
-            style={{ width: "60%", borderRadius: 20, marginLeft: 10 }}
-            isDisabled={false}
-            isInvalid={false}
-            isReadOnly={false}
-          >
-            <InputField
-              id="username"
-              value={formData.username}
-              onChangeText={(e) => {
-                handleChange("username", e);
+        <SafeAreaView>
+          <Box display="flex" justifyContent="center" alignItems="center">
+            <Image
+              size="md"
+              style={{
+                width: "80%",
+                height: 200,
               }}
-              placeholder="Tên tài khoản"
+              alt="loginImg"
+              source={require("../../assets/images/loginImage.png")}
             />
-          </Input>
-        </Box>
-        <Box
-          style={{ marginTop: 20 }}
-          display="flex"
-          flexDirection="row"
-          justifyContent="center"
-          alignItems="center"
-        >
-          <Icon as={Mail} size="xl" />
-          <Input
-            variant="outline"
-            size="md"
-            style={{ width: "60%", borderRadius: 20, marginLeft: 10 }}
-            isDisabled={false}
-            isInvalid={false}
-            isReadOnly={false}
-          >
-            <InputField
-              id="email"
-              value={formData.email}
-              onChangeText={(e) => {
-                handleChange("email", e);
+          </Box>
+          <Box display="flex" justifyContent="center" alignItems="center">
+            <Text
+              style={{
+                fontWeight: "bold",
+                fontSize: 30,
+                lineHeight: 40 * 0.75,
+                paddingTop: 40 - 35 * 0.75,
+                textTransform: "uppercase",
+                color: "#230B41",
               }}
-              placeholder="Email"
-            />
-          </Input>
-        </Box>
-        <Box
-          style={{ marginTop: 20 }}
-          display="flex"
-          flexDirection="row"
-          justifyContent="center"
-          alignItems="center"
-        >
-          <Icon as={Lock} size="xl" />
-          <Input
-            variant="outline"
-            size="md"
-            style={{ width: "60%", borderRadius: 20, marginLeft: 10 }}
-            isDisabled={false}
-            isInvalid={false}
-            isReadOnly={false}
-          >
-            <InputField
-              id="password"
-              value={formData.password}
-              onChangeText={(e) => {
-                handleChange("password", e);
-              }}
-              type="password"
-              placeholder="Mật khẩu"
-            />
-          </Input>
-        </Box>
-        <Box
-          style={{ marginTop: 20 }}
-          display="flex"
-          flexDirection="row"
-          justifyContent="center"
-          alignItems="center"
-        >
-          <Icon as={Lock} size="xl" />
-          <Input
-            variant="outline"
-            size="md"
-            style={{ width: "60%", borderRadius: 20, marginLeft: 10 }}
-            isDisabled={false}
-            isInvalid={false}
-            isReadOnly={false}
-          >
-            <InputField
-              id="password_confirmation"
-              value={formData.password_confirmation}
-              onChangeText={(e) => {
-                handleChange("password_confirmation", e);
-              }}
-              type="password"
-              placeholder="Nhập lại mật khẩu"
-            />
-          </Input>
-        </Box>
-        <Box
-          style={{ marginTop: 20 }}
-          display="flex"
-          flexDirection="row"
-          justifyContent="center"
-          alignItems="center"
-        >
-          <Icon as={Phone} size="xl" />
-          <Input
-            variant="outline"
-            size="md"
-            style={{ width: "60%", borderRadius: 20, marginLeft: 10 }}
-            isDisabled={false}
-            isInvalid={false}
-            isReadOnly={false}
-          >
-            <InputField
-              id="phone"
-              value={formData.phone}
-              onChangeText={(e) => {
-                handleChange("phone", e);
-              }}
-              placeholder="Số điện thoại"
-            />
-          </Input>
-        </Box>
-        <Box
-          style={{ marginTop: 20 }}
-          display="flex"
-          flexDirection="row"
-          justifyContent="center"
-          alignItems="center"
-        >
-          <Button
-            onPress={() => {
-              // router.push("/login/");
-              handleRegister();
-            }}
-            size="md"
-            variant="solid"
-            action="primary"
-            isDisabled={disableButton}
-            isFocusVisible={false}
-            style={{
-              borderRadius: 20,
-              backgroundColor: "#230B41",
-              paddingLeft: 25,
-              paddingRight: 25,
-            }}
+            >
+              Đăng ký
+            </Text>
+            <Text>
+              Đã có tài khoản?{" "}
+              <Link href={"/login/"} style={{ fontWeight: "bold" }}>
+                {" "}
+                Đăng nhập
+              </Link>
+            </Text>
+          </Box>
+          <Box
+            style={{ marginTop: 40 }}
             display="flex"
+            flexDirection="row"
             justifyContent="center"
             alignItems="center"
           >
-            <ButtonText>Đăng ký </ButtonText>
-          </Button>
-        </Box>
+            <Icon as={CircleUser} size="xl" />
+            <Input
+              variant="outline"
+              size="md"
+              style={{ width: "60%", borderRadius: 20, marginLeft: 10 }}
+              isDisabled={false}
+              isInvalid={false}
+              isReadOnly={false}
+            >
+              <InputField
+                id="username"
+                value={formData.username}
+                onChangeText={(e) => {
+                  handleChange("username", e);
+                }}
+                placeholder="Tên tài khoản"
+              />
+            </Input>
+          </Box>
+          <Box
+            style={{ marginTop: 20 }}
+            display="flex"
+            flexDirection="row"
+            justifyContent="center"
+            alignItems="center"
+          >
+            <Icon as={Mail} size="xl" />
+            <Input
+              variant="outline"
+              size="md"
+              style={{ width: "60%", borderRadius: 20, marginLeft: 10 }}
+              isDisabled={false}
+              isInvalid={false}
+              isReadOnly={false}
+            >
+              <InputField
+                id="email"
+                value={formData.email}
+                onChangeText={(e) => {
+                  handleChange("email", e);
+                }}
+                placeholder="Email"
+              />
+            </Input>
+          </Box>
+          <Box
+            style={{ marginTop: 20 }}
+            display="flex"
+            flexDirection="row"
+            justifyContent="center"
+            alignItems="center"
+          >
+            <Icon as={Lock} size="xl" />
+            <Input
+              variant="outline"
+              size="md"
+              style={{ width: "60%", borderRadius: 20, marginLeft: 10 }}
+              isDisabled={false}
+              isInvalid={false}
+              isReadOnly={false}
+            >
+              <InputField
+                id="password"
+                value={formData.password}
+                onChangeText={(e) => {
+                  handleChange("password", e);
+                }}
+                type="password"
+                placeholder="Mật khẩu"
+              />
+            </Input>
+          </Box>
+          <Box
+            style={{ marginTop: 20 }}
+            display="flex"
+            flexDirection="row"
+            justifyContent="center"
+            alignItems="center"
+          >
+            <Icon as={Lock} size="xl" />
+            <Input
+              variant="outline"
+              size="md"
+              style={{ width: "60%", borderRadius: 20, marginLeft: 10 }}
+              isDisabled={false}
+              isInvalid={false}
+              isReadOnly={false}
+            >
+              <InputField
+                id="password_confirmation"
+                value={formData.password_confirmation}
+                onChangeText={(e) => {
+                  handleChange("password_confirmation", e);
+                }}
+                type="password"
+                placeholder="Nhập lại mật khẩu"
+              />
+            </Input>
+          </Box>
+          <Box
+            style={{ marginTop: 20 }}
+            display="flex"
+            flexDirection="row"
+            justifyContent="center"
+            alignItems="center"
+          >
+            <Icon as={Phone} size="xl" />
+            <Input
+              variant="outline"
+              size="md"
+              style={{ width: "60%", borderRadius: 20, marginLeft: 10 }}
+              isDisabled={false}
+              isInvalid={false}
+              isReadOnly={false}
+            >
+              <InputField
+                id="phone"
+                value={formData.phone}
+                onChangeText={(e) => {
+                  handleChange("phone", e);
+                }}
+                placeholder="Số điện thoại"
+              />
+            </Input>
+          </Box>
+          <Box
+            style={{ marginTop: 20 }}
+            display="flex"
+            flexDirection="row"
+            justifyContent="center"
+            alignItems="center"
+          >
+            <Button
+              onPress={() => {
+                // router.push("/login/");
+                handleRegister();
+              }}
+              size="md"
+              variant="solid"
+              action="primary"
+              isDisabled={disableButton}
+              isFocusVisible={false}
+              style={{
+                borderRadius: 20,
+                backgroundColor: "#230B41",
+                paddingLeft: 25,
+                paddingRight: 25,
+              }}
+              display="flex"
+              justifyContent="center"
+              alignItems="center"
+            >
+              <ButtonText>Đăng ký </ButtonText>
+            </Button>
+          </Box>
+        </SafeAreaView>
       </ScrollView>
       <Image
         size="md"

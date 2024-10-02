@@ -1,3 +1,10 @@
+import { sendGet, sendPost } from "@/api/axiosClient";
+import { formatCurrency } from "@/components/components/Course";
+import Tab1 from "@/components/components/CourseInfo/Tab1";
+import Tab2 from "@/components/components/CourseInfo/Tab2";
+import Notification from "@/components/components/Notification";
+import Transition from "@/components/components/Transition";
+import { useGlobalState } from "@/context/globalContext";
 import {
   Box,
   Button,
@@ -14,479 +21,533 @@ import {
   ModalFooter,
   ModalHeader,
   ScrollView,
+  Spinner,
   Text,
   Textarea,
   TextareaInput,
   View,
+  useToast,
 } from "@gluestack-ui/themed";
+import { useRouter } from "expo-router";
+import { ChevronLeftCircle } from "lucide-react-native";
 import React, { useEffect, useRef, useState } from "react";
 import { StyleSheet, TouchableOpacity } from "react-native";
-import LessonItem from "@/components/components/LessonItem";
-import Course, { CourseItem } from "@/components/components/Course";
-import ReviewItem from "@/components/components/ReviewItem";
-import { ChevronLeftCircle } from "lucide-react-native";
-import { useRouter } from "expo-router";
-import { useGlobalState } from "@/context/globalContext";
-import { sendGet } from "@/api/axiosClient";
 import { Rating } from "react-native-ratings";
+import { SafeAreaView } from "react-native-safe-area-context";
 const index = () => {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState(0);
   const [courseInfo, setCourseInfo] = useState<any>({});
+  const [isLoading, setIsLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
+  const [listReview, setListReview] = useState([]);
+  const [rating, setRating] = useState<any>(5);
+  const [value, setValue] = useState("");
+  const toast = useToast();
+  const { isLogin, setCartList, myCourseList } = useGlobalState();
+  // Hàm xử lý sự kiện khi nội dung của Textarea thay đổi
+  const handleChange = (event: any) => {
+    setValue(event);
+  };
   const ref = useRef(null);
   const handleChangeActiveTab = (i: number) => {
     setActiveTab(i);
   };
   const { globalState } = useGlobalState();
-  const handleShowCourse = async () => {
+  const handlePostReview = async () => {
     try {
-      const res = await sendGet(`/user/course/${globalState?.id}`);
-      setCourseInfo(res?.data?.data);
+      const res: any = await sendPost(
+        `/user/course/${globalState?.id}/review`,
+        {
+          content: value,
+          star: rating,
+        }
+      );
+      if (res.success === true) {
+        toast.show({
+          placement: "top",
+          render: ({ id }) => {
+            const toastId = "toast-" + id;
+            return (
+              <Notification
+                id={toastId}
+                description="Cám ơn bạn đã đánh giá khoá học này"
+                color="success"
+                title="Thành công"
+              />
+            );
+          },
+        });
+        setShowModal(false);
+      }
+    } catch (err: any) {
+      console.log(err);
+      toast.show({
+        placement: "top",
+        render: ({ id }) => {
+          const toastId = "toast-" + id;
+          return (
+            <Notification
+              id={toastId}
+              description={err?.response?.data?.error_msg}
+              color="error"
+              title="Lỗi"
+            />
+          );
+        },
+      });
+    }
+  };
+  const handleGetListReview = async () => {
+    try {
+      const res = await sendGet(`/user/course/${globalState?.id}/list-review`);
+      setListReview(res?.data?.data);
     } catch (err) {
       console.log(err);
     }
   };
+  const handleShowCourse = async () => {
+    try {
+      const res = await sendGet(`/user/course/${globalState?.id}`);
+      setCourseInfo(res?.data?.data);
+      setIsLoading(false);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+  const handleShowRating = async (rating: Number) => {
+    setRating(rating);
+  };
+
   useEffect(() => {
     if (globalState?.id) {
+      handleGetListReview();
       handleShowCourse();
     }
   }, [globalState]);
+  const handleAddCart = async () => {
+    try {
+      if (isLogin) {
+        const res: any = await sendPost(`/user/cart`, {
+          course_id: globalState.id,
+        });
+        if (res.success === true) {
+          setCartList((prevState: any) => [...prevState, res.data.data]);
+          toast.show({
+            placement: "top",
+            render: ({ id }) => {
+              const toastId = "toast-" + id;
+              return (
+                <Notification
+                  id={toastId}
+                  description="Thêm vào giỏ hàng thành công"
+                  color="success"
+                  title="Thành công"
+                />
+              );
+            },
+          });
+          router.push("/Checkout/");
+        }
+      } else {
+        toast.show({
+          placement: "top",
+          render: ({ id }) => {
+            const toastId = "toast-" + id;
+            return (
+              <Notification
+                id={toastId}
+                description="Bạn cần đăng nhập để tiếp tục"
+                color="error"
+                title="Lỗi"
+              />
+            );
+          },
+        });
+      }
+    } catch (err: any) {
+      if (err.response.status === 409) {
+        router.push("/Checkout/");
+      } else {
+        toast.show({
+          placement: "top",
+          render: ({ id }) => {
+            const toastId = "toast-" + id;
+            return (
+              <Notification
+                id={toastId}
+                description={err?.response?.data?.error_msg}
+                color="error"
+                title="Lỗi"
+              />
+            );
+          },
+        });
+      }
+    }
+  };
   return (
-    <ScrollView
-      style={{
-        height: "100%",
-        position: "relative",
-        backgroundColor: "#e7f1f5",
-      }}
-    >
-      <View
+    <SafeAreaView style={{paddingHorizontal: 20}}>
+      <ScrollView
+        contentContainerStyle={{ flexGrow: 1 }}
+        showsHorizontalScrollIndicator={false}
+        showsVerticalScrollIndicator={false}
         style={{
-          width: "100%",
-          paddingLeft: 40,
-          paddingRight: 40,
-          paddingBottom: 15,
-          backgroundColor: "#e7f1f5",
-          marginTop: 60,
+          height: "100%",
           position: "relative",
-          display: "flex",
-          flexDirection: "row",
-          justifyContent: "center",
-          alignItems: "center",
+          // backgroundColor: "#e7f1f5",
         }}
       >
-        <TouchableOpacity
-          style={{
-            position: "absolute",
-            left: 15,
-            top: 7.5,
-          }}
-          onPress={() => {
-            router.back();
-          }}
-        >
-          <Icon as={ChevronLeftCircle} size="xl" />
-        </TouchableOpacity>
-        <Text
-          // fontFamily="Poppins_700Bold"
-          style={{
-            fontWeight: "bold",
-            fontSize: 21,
-            textTransform: "uppercase",
-            lineHeight: 35 * 0.75,
-            paddingTop: 35 - 40 * 0.75,
-          }}
-          numberOfLines={2}
-        >
-          {courseInfo?.name}
-        </Text>
-      </View>
-      <Image
-        source={{
-          uri: courseInfo?.image?.url,
-        }}
-        alt="coverImg"
-        style={styles.coverImg}
-      />
-      <Box
-        style={{
-          marginTop: -90,
-          overflow: "visible",
-          zIndex: 100,
-        }}
-      >
-        <Box
-          style={{
-            backgroundColor: "#e7f1f5",
-            borderTopLeftRadius: 40,
-            borderTopRightRadius: 40,
-            marginTop: 60,
-            overflow: "visible",
-            zIndex: 10,
-            height: 30,
-          }}
-        >
-          <Box
-            display="flex"
-            flexDirection="row"
-            justifyContent="center"
-            alignItems="center"
-            style={{
-              marginTop: -19,
-            }}
-          >
-            <Button
-              size="md"
-              variant="solid"
-              action="primary"
-              isDisabled={false}
-              isFocusVisible={false}
-              style={{
-                borderRadius: 20,
-                backgroundColor: "#fff",
-                paddingLeft: 30,
-                paddingRight: 30,
-                overflow: "visible",
-                zIndex: 130,
-              }}
-              display="flex"
-              justifyContent="center"
-              alignItems="center"
-              onPress={() => {
-                router.push("/CourseDetails/");
-              }}
-            >
-              <ButtonText
+        {isLoading === false ? (
+          <>
+            <Transition>
+              <View
                 style={{
-                  color: "#000",
-                  fontSize: 21,
-                  fontWeight: "bold",
-                  textTransform: "uppercase",
-                  lineHeight: 35 * 0.75,
+                  width: "100%",
+                  paddingRight: 20,
+                  paddingBottom: 10,
+                  // backgroundColor: "#e7f1f5",
+                  position: "relative",
+                  display: "flex",
+                  flexDirection: "row",
+                  alignItems: "center",
                 }}
               >
-                Đăng ký{" "}
-              </ButtonText>
-            </Button>
-          </Box>
-        </Box>
-        <View
-          mt={5}
-          display="flex"
-          flexDirection="row"
-          alignItems="stretch"
-          style={{
-            backgroundColor: "#fff",
-            borderRadius: 30,
-            marginHorizontal: 10,
-          }}
-        >
-          <TouchableOpacity
-            onPress={() => {
-              handleChangeActiveTab(0);
-            }}
-            style={[styles.tab, activeTab === 0 ? styles.tabActive : null]}
-          >
-            <Text
-              style={activeTab === 0 ? styles.tabActive : null}
-              // fontFamily="Poppins_400Regular"
-            >
-              Bài Giảng
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => {
-              handleChangeActiveTab(1);
-            }}
-            style={[styles.tab, activeTab === 1 ? styles.tabActive : null]}
-          >
-            <Text
-              // fontFamily="Poppins_400Regular"
-              style={activeTab === 1 ? styles.tabActive : null}
-            >
-              Giáo viên
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => {
-              handleChangeActiveTab(2);
-            }}
-            style={[styles.tab, activeTab === 2 ? styles.tabActive : null]}
-          >
-            <Text
-              // fontFamily="Poppins_400Regular"
-              style={activeTab === 2 ? styles.tabActive : null}
-            >
-              Liên Quan
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => {
-              handleChangeActiveTab(3);
-            }}
-            style={[styles.tab, activeTab === 3 ? styles.tabActive : null]}
-          >
-            <Text
-              style={activeTab === 3 ? styles.tabActive : null}
-
-              // fontFamily="Poppins_400Regular"
-            >
-              Đánh giá
-            </Text>
-          </TouchableOpacity>
-        </View>
-        <View display="flex" justifyContent="center" alignItems="center">
-          <View
-            style={{
-              borderBottomColor: "black",
-              width: "50%",
-              marginTop: 10,
-              marginBottom: 10,
-            }}
-          />
-        </View>
-        <View marginHorizontal={10} marginTop={5} marginBottom={15}>
-          {(activeTab == 0 && (
-            <>
-              <Box
-                display="flex"
-                justifyContent="space-between"
-                alignItems="center"
-                flexDirection="row"
-                style={{
-                  marginHorizontal: 20,
-                  marginBottom: 10,
-                }}
-              >
-                <Text
-                  // fontFamily="Poppins_600SemiBold"
-                  style={styles.lessonTitle}
-                >
-                  Chi tiết khoá học:
-                </Text>
-                <Text
-                  // fontFamily="Poppins_700Bold"
-                  style={styles.lessonCount}
-                >
-                  {courseInfo?.total_lessions} videos
-                </Text>
-              </Box>
-              <Text
-                // fontFamily="Poppins_400Regular"
-                paddingHorizontal={20}
-                style={{
-                  fontSize: 12,
-                  color: "#000",
-                }}
-              >
-                {courseInfo?.description}
-                <Text
-                  // fontFamily="Poppins_400Regular_Italic"
-                  style={{
-                    color: "#38B6FF",
-                    fontSize: 12,
-                    fontStyle: "italic",
+                <TouchableOpacity
+                  onPress={() => {
+                    router.back();
                   }}
                 >
-                  Xem Thêm
+                  <Icon as={ChevronLeftCircle} size="lg" />
+                </TouchableOpacity>
+                <Text
+                  style={{
+                    fontWeight: "bold",
+                    fontSize: 14,
+                    textTransform: "uppercase",
+                    marginLeft: 10,
+                  }}
+                  numberOfLines={1}
+                >
+                  {courseInfo?.name}
                 </Text>
-              </Text>
-              {courseInfo?.lessions?.map((item: any) => (
-                <LessonItem data={item} key={item?.id} />
-              ))}
-            </>
-          )) ||
-            (activeTab == 1 && (
-              <>
-                <Box
+              </View>
+              <Image
+                source={{
+                  uri: courseInfo?.image?.url,
+                }}
+                alt="coverImg"
+                style={styles.coverImg}
+              />
+              <Box
+                style={{
+                  overflow: "visible",
+                  zIndex: 100,
+                }}
+              >
+                <View
                   display="flex"
                   justifyContent="space-between"
                   alignItems="center"
                   flexDirection="row"
-                  style={{
-                    marginHorizontal: 20,
-                    marginBottom: 10,
-                  }}
+                  mt={20}
+                  mb={10}
                 >
-                  <Text
-                    // fontFamily="Poppins_600SemiBold"
-                    style={styles.lessonTitle}
-                  >
-                    Thông tin Giáo viên:
-                  </Text>
-                </Box>
-                <Box
-                  display="flex"
-                  flexDirection="row"
-                  alignItems="center"
-                  style={{
-                    marginHorizontal: 20,
-                    marginBottom: 10,
-                  }}
-                >
-                  <Image
-                    source={{
-                      uri: courseInfo?.author?.image?.url,
-                    }}
-                    alt="coverImg"
+                  <View
+                    display="flex"
+                    flexDirection="column"
+                    gap={10}
                     style={{
-                      width: 40,
-                      height: 40,
-                      borderRadius: 50,
+                      maxWidth: 220,
                     }}
-                  />
-                  <Text ml={5} fontWeight="bold">
-                    {courseInfo?.author?.name}
-                  </Text>
-                </Box>
-                <Text
-                  // fontFamily="Poppins_400Regular"
-                  paddingHorizontal={20}
-                  style={{
-                    fontSize: 12,
-                    color: "#000",
-                  }}
-                >
-                  {courseInfo?.author?.description}
+                  >
+                    <View
+                      display="flex"
+                      alignItems="stretch"
+                      flexDirection="row"
+                      gap={5}
+                    >
+                      <Image
+                        source={{
+                          uri: courseInfo?.author?.image?.url,
+                        }}
+                        alt="coverImg"
+                        style={styles.avaImg}
+                      />
+                      <View display="flex">
+                        <Text
+                          style={{
+                            fontWeight: "bold",
+                            fontSize: 14,
+                            textTransform: "uppercase",
+                          }}
+                          numberOfLines={2}
+                        >
+                          {courseInfo?.name}
+                        </Text>
+                        <Text fontSize="$xs" color="#94a3b8">
+                          {courseInfo?.author?.name}
+                        </Text>
+                        <Text
+                          fontSize="$xs"
+                          color="#94a3b8"
+                          numberOfLines={1}
+                          ellipsizeMode="tail"
+                        >
+                          {courseInfo?.lessions?.length} bài học -{" "}
+                          {courseInfo?.categories
+                            ?.map((item: any) => item.name)
+                            .join(" - ")}
+                        </Text>
+                      </View>
+                    </View>
+                  </View>
+                </View>
+
+                <Text mb={5} fontSize="$sm">
+                  {courseInfo?.description}
                 </Text>
-              </>
-            )) ||
-            (activeTab == 2 && (
-              <Box
-                style={{
-                  marginTop: 10,
-                  rowGap: 20,
-                  marginBottom: 20,
-                }}
-                display="flex"
-                flexDirection="row"
-                flexWrap="wrap"
-                alignItems="stretch"
-              ></Box>
-            )) ||
-            (activeTab == 3 && (
-              <Box paddingHorizontal={20} marginBottom={20}>
                 <Button
-                  onPress={() => {
-                    setShowModal(true);
-                  }}
                   size="md"
                   variant="solid"
                   action="primary"
+                  isDisabled={false}
                   isFocusVisible={false}
+                  mb={10}
                   style={{
+                    width: "100%",
                     borderRadius: 20,
-                    paddingLeft: 20,
-                    paddingRight: 20,
-                    marginBottom: 10,
+                    overflow: "visible",
+                    zIndex: 130,
                   }}
-                  bg="#56b7ea"
-                  $hover-bg="#56b7ea"
-                  $active-bg="#56b7ea"
+                  bg="#61bc84"
+                  $hover-bg="#61bc84"
+                  $active-bg="#61bc84"
                   $_text-hover-color="$white"
                   display="flex"
                   justifyContent="center"
                   alignItems="center"
+                  onPress={() => {
+                    // router.push("/CourseDetails/");
+                    if (
+                      !myCourseList
+                        .map((item: any) => item.course.id)
+                        .includes(globalState.id)
+                    ) {
+                      handleAddCart();
+                    }
+                  }}
                 >
-                  <ButtonText textTransform="uppercase">
-                    Đánh giá của bạn
+                  <ButtonText
+                    style={{
+                      color: "#fff",
+                      fontSize: 16,
+                      fontWeight: "bold",
+                      textTransform: "uppercase",
+                      lineHeight: 35 * 0.75,
+                    }}
+                  >
+                    {myCourseList
+                      .map((item: any) => item.course.id)
+                      .includes(globalState.id)
+                      ? "Đã mua"
+                      : `Đăng ký - ${formatCurrency(
+                          courseInfo?.is_promote === 1
+                            ? Number(courseInfo?.promote_price)
+                            : Number(courseInfo?.price)
+                        )}`}
                   </ButtonText>
                 </Button>
-                <Text
-                  // fontFamily="Poppins_600SemiBold"
-                  style={{ marginBottom: 10 }}
+                <View
+                  mt={5}
+                  display="flex"
+                  flexDirection="row"
+                  alignItems="flex-end"
+                  gap={15}
+                  borderBottomWidth={1}
+                  borderBottomColor="#6c757d"
+                  pb={3}
+                  // alignItems="stretch"
+                  // style={{
+                  //   backgroundColor: "#fff",
+                  //   borderRadius: 30,
+                  //   marginHorizontal: 10,
+                  // }}
                 >
-                  Tất cả đánh giá:
-                </Text>
-                <Box paddingHorizontal={20}>
-                  <ReviewItem />
-                  <ReviewItem />
-                  <ReviewItem />
-                  <ReviewItem />
+                  <TouchableOpacity
+                    onPress={() => {
+                      handleChangeActiveTab(0);
+                    }}
+                  >
+                    <Text style={[activeTab === 0 ? styles.textActive : null]}>
+                      Bài Giảng
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => {
+                      handleChangeActiveTab(3);
+                    }}
+                  >
+                    <Text style={[activeTab === 3 ? styles.textActive : null]}>
+                      Đánh giá
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+                <View
+                  display="flex"
+                  justifyContent="center"
+                  alignItems="center"
+                >
+                  <View
+                    style={{
+                      borderBottomColor: "black",
+                      width: "50%",
+                      marginTop: 10,
+                      marginBottom: 10,
+                    }}
+                  />
+                </View>
+                <View marginTop={5} marginBottom={15}>
+                  {(activeTab == 0 && <Tab1 courseInfo={courseInfo} />) ||
+                    (activeTab == 3 && (
+                      <Tab2
+                        listReview={listReview}
+                        onSubmit={() => {
+                          if (isLogin) {
+                            setShowModal(true);
+                          } else {
+                            toast.show({
+                              placement: "top",
+                              render: ({ id }) => {
+                                const toastId = "toast-" + id;
+                                return (
+                                  <Notification
+                                    id={toastId}
+                                    description="Bạn cần đăng nhập để tiếp tục"
+                                    color="error"
+                                    title="Lỗi"
+                                  />
+                                );
+                              },
+                            });
+                          }
+                        }}
+                      />
+                    ))}
+                </View>
+              </Box>
+            </Transition>
+          </>
+        ) : (
+          <>
+            <View
+              style={{
+                width: "100%",
+                height: "100%",
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <Spinner size="large" color="#2E8B57" />
+            </View>
+          </>
+        )}
+        <Modal
+          isOpen={showModal}
+          onClose={() => {
+            setShowModal(false);
+          }}
+          finalFocusRef={ref}
+        >
+          <ModalBackdrop />
+          <ModalContent style={{ backgroundColor: "#fff" }}>
+            <ModalHeader>
+              <Heading size="lg">Đánh giá về khoá học này</Heading>
+              <ModalCloseButton>
+                <Icon as={CloseCircleIcon} />
+              </ModalCloseButton>
+            </ModalHeader>
+            <ModalBody style={{ backgroundColor: "#fff" }}>
+              <Box display="flex" flexDirection="row" alignItems="center">
+                <Image
+                  size="md"
+                  alt="avatar"
+                  style={{
+                    width: 50,
+                    height: 50,
+                    borderRadius: 50,
+                  }}
+                  source={require("../../assets/images/avatar.jpg")}
+                />
+                <Box ml={5}>
+                  <Text fontWeight="bold">Đatprs</Text>
+                  <Rating
+                    onFinishRating={handleShowRating}
+                    ratingCount={rating}
+                    imageSize={20}
+                  />
                 </Box>
               </Box>
-            ))}
-        </View>
-      </Box>
-      <Modal
-        isOpen={showModal}
-        onClose={() => {
-          setShowModal(false);
-        }}
-        finalFocusRef={ref}
-      >
-        <ModalBackdrop />
-        <ModalContent style={{ backgroundColor: "#fff" }}>
-          <ModalHeader>
-            <Heading size="lg">Đánh giá về khoá học này</Heading>
-            <ModalCloseButton>
-              <Icon as={CloseCircleIcon} />
-            </ModalCloseButton>
-          </ModalHeader>
-          <ModalBody style={{ backgroundColor: "#fff" }}>
-            <Box display="flex" flexDirection="row" alignItems="center">
-              <Image
+              <Textarea
+                mt={10}
                 size="md"
-                alt="avatar"
-                style={{
-                  width: 50,
-                  height: 50,
-                  borderRadius: 50,
+                isReadOnly={false}
+                isInvalid={false}
+                isDisabled={false}
+              >
+                <TextareaInput
+                  // onChangeText={(e: any) => handleChange(e)}
+                  placeholder="Đánh giá của bạn về khoá học này..."
+                />
+              </Textarea>
+            </ModalBody>
+            <ModalFooter>
+              <Button
+                variant="outline"
+                size="sm"
+                action="secondary"
+                mr="$3"
+                onPress={() => {
+                  setShowModal(false);
                 }}
-                source={require("../../assets/images/avatar.jpg")}
-              />
-              <Box ml={5}>
-                <Text fontWeight="bold">Đatprs</Text>
-                <Rating ratingCount={5} imageSize={20} />
-              </Box>
-            </Box>
-            <Textarea
-              mt={10}
-              size="md"
-              isReadOnly={false}
-              isInvalid={false}
-              isDisabled={false}
-            >
-              <TextareaInput placeholder="Đánh giá của bạn về khoá học này..." />
-            </Textarea>
-          </ModalBody>
-          <ModalFooter>
-            <Button
-              variant="outline"
-              size="sm"
-              action="secondary"
-              mr="$3"
-              onPress={() => {
-                setShowModal(false);
-              }}
-            >
-              <ButtonText>Huỷ bỏ</ButtonText>
-            </Button>
-            <Button
-              size="sm"
-              action="positive"
-              borderWidth="$0"
-              bg="#56b7ea"
-              $hover-bg="#56b7ea"
-              $active-bg="#56b7ea"
-              $_text-hover-color="$white"
-              onPress={() => {
-                setShowModal(false);
-              }}
-            >
-              <ButtonText>Gửi đánh giá</ButtonText>
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
-    </ScrollView>
+              >
+                <ButtonText>Huỷ bỏ</ButtonText>
+              </Button>
+              <Button
+                size="sm"
+                action="positive"
+                borderWidth="$0"
+                bg="#61bc84"
+                $hover-bg="#61bc84"
+                $active-bg="#61bc84"
+                $_text-hover-color="$white"
+                onPress={() => {
+                  handlePostReview();
+                }}
+              >
+                <ButtonText>Gửi đánh giá</ButtonText>
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 const styles = StyleSheet.create({
   coverImg: {
     width: "100%",
-    height: 250,
+    // height: 250,
+    height: 150,
     objectFit: "cover",
+    borderRadius: 20,
+  },
+  avaImg: {
+    width: 80,
+    height: 80,
+    borderRadius: 50,
   },
   navTitle: {
     color: "#333",
@@ -494,7 +555,7 @@ const styles = StyleSheet.create({
   },
   navTitleActive: {
     fontWeight: "bold",
-    // fontFamily: "Poppins_600SemiBold",
+    // fontFamily: "_600SemiBold",
   },
   lessonTitle: {
     fontSize: 24,
@@ -503,7 +564,7 @@ const styles = StyleSheet.create({
     paddingTop: 35 - 35 * 0.75,
   },
   lessonCount: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: "bold",
     lineHeight: 35 * 0.75,
     color: "#78C1Ea",
@@ -518,8 +579,13 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   tabActive: {
-    backgroundColor: "#56b7ea",
+    backgroundColor: "#61bc84",
     color: "#fff",
+  },
+  textActive: {
+    color: "#61bc84",
+    fontWeight: "bold",
+    // fontSize: 18,
   },
 });
 export default index;

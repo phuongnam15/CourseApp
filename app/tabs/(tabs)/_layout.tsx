@@ -1,57 +1,14 @@
 import { useClientOnlyValue } from "@/components/useClientOnlyValue";
 import { View } from "@gluestack-ui/themed";
-import { LinearGradient } from "expo-linear-gradient";
 import { Tabs } from "expo-router";
-import { Plus } from "lucide-react-native";
 import React from "react";
-import { StyleSheet } from "react-native";
+import { Platform } from "react-native";
 import Svg, { Circle, G, Path } from "react-native-svg";
-const RoundedIconButton = ({ color }: any) => {
-  return (
-    <LinearGradient
-      colors={["#0097b2", "#7ed957"]}
-      start={{ x: 0, y: 0 }} // Điểm bắt đầu ở góc trên bên trái
-      end={{ x: 1, y: 0 }} // Điểm kết thúc ở góc trên bên phải
-      style={{
-        ...styles.buttonContainer,
-      }}
-    >
-      <View style={styles.shadowButton}>
-        <Plus size={40} color="#fff" />
-      </View>
-    </LinearGradient>
-  );
-};
-
-const styles = StyleSheet.create({
-  buttonContainer: {
-    borderRadius: 50,
-    width: 50,
-    height: 50,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#fff",
-    padding: 20,
-    top: -23,
-    // Sử dụng bóng nhưng chỉ áp dụng cho nửa trên của hình tròn
-  },
-  shadowButton: {
-    shadowColor: "#0097b2",
-    shadowOffset: {
-      width: 0,
-      height: 12, // Điều chỉnh độ cao của bóng theo nhu cầu của bạn
-    },
-    shadowOpacity: 0.58,
-    shadowRadius: 16.0,
-    elevation: 24,
-    color: "#fff",
-  },
-});
 export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: "#69b4ff",
+        tabBarActiveTintColor: "#2E8B57",
         headerShown: useClientOnlyValue(false, true),
         headerShadowVisible: true,
         tabBarStyle: {
@@ -62,8 +19,6 @@ export default function TabLayout() {
           shadowOpacity: 0.58,
           shadowRadius: 16.0,
           elevation: 24,
-          // borderTopLeftRadius: 21,
-          // borderTopRightRadius: 21,
           backgroundColor: "#fff",
           position: "relative",
           bottom: 0,
@@ -71,9 +26,10 @@ export default function TabLayout() {
           zIndex: 0,
           borderWidth: 0,
           borderTopWidth: 0,
-          paddingBottom: 20,
-          borderTopLeftRadius: 30,
-          borderTopRightRadius: 30,
+          paddingBottom: Platform.OS === 'android' ? 10 : 20,
+          // borderTopLeftRadius: 30,
+          // borderTopRightRadius: 30,
+          // paddingTop: -20,
         },
       }}
     >
@@ -92,7 +48,7 @@ export default function TabLayout() {
                 alignItems: "center",
                 width: 100,
                 paddingTop: 10,
-                borderTopLeftRadius: 30,
+                // borderTopLeftRadius: 30,
               }}
             >
               <Svg height={28} viewBox="0 0 512 512" width={28}>
@@ -155,16 +111,16 @@ export default function TabLayout() {
                 display: "flex",
                 justifyContent: "center",
                 alignItems: "center",
-                padding: 10,
-                paddingVertical: 10,
+                padding: 5,
+                paddingVertical: 5,
                 borderRadius: 50,
                 position: 'absolute',
-                top: -30
+                top: -15
               }}
             >
               <View style={{
                 padding: 10,
-                backgroundColor: "#69b4ff",
+                backgroundColor: "#2E8B57",
                 borderRadius: 50,
               }}>
                 <Svg
@@ -243,7 +199,7 @@ export default function TabLayout() {
                 alignItems: "center",
                 width: 100,
                 paddingTop: 10,
-                borderTopRightRadius: 30,
+                // borderTopRightRadius: 30,
               }}
             >
               <Svg

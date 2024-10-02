@@ -33,7 +33,6 @@ const WishlistItem = () => {
             fontSize={16}
             fontWeight="bold"
             textTransform="uppercase"
-            // fontFamily="Poppins_600SemiBold"
             style={{
               lineHeight: 35 * 0.75,
               paddingTop: 35 - 35 * 0.75,
@@ -46,7 +45,6 @@ const WishlistItem = () => {
             <Box display="flex" flexDirection="row" alignItems="center">
               <Icon as={User} size="xs" color="#6c757d" />
               <Text
-                // fontFamily="Poppins_400Regular"
                 style={{
                   fontSize: 12,
                   marginLeft: 5,
@@ -57,9 +55,8 @@ const WishlistItem = () => {
               </Text>
             </Box>
             <Box display="flex" flexDirection="row" alignItems="center">
-              <Icon as={BookCheck} size="xs" color="#69b4ff" />
+              <Icon as={BookCheck} size="xs" color="#2E8B57" />
               <Text
-                // fontFamily="Poppins_400Regular"
                 style={{
                   fontSize: 12,
                   marginLeft: 5,
@@ -72,7 +69,6 @@ const WishlistItem = () => {
             <Box display="flex" flexDirection="row" alignItems="center">
               <Icon as={Clock9} size="xs" color="$yellow500" />
               <Text
-                // fontFamily="Poppins_400Regular"
                 style={{
                   fontSize: 12,
                   marginLeft: 5,
@@ -87,10 +83,9 @@ const WishlistItem = () => {
       </Box>
       <Box mt={5} display="flex" flexDirection="row" alignItems="center">
         <Text
-          // fontFamily="Poppins_600SemiBold"
           style={{
             fontSize: 16,
-            color: "#56b7ea",
+            color: "#61bc84",
           }}
         >
           199.999đ
@@ -116,9 +111,9 @@ const WishlistItem = () => {
           action="primary"
           isDisabled={false}
           isFocusVisible={false}
-          borderColor="#69b4ff"
+          borderColor="#2E8B57"
         >
-          <ButtonText color="#69b4ff">Bắt đầu học </ButtonText>
+          <ButtonText color="#2E8B57">Bắt đầu học </ButtonText>
         </Button>
       </Box>
     </View>

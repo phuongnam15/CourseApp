@@ -4,34 +4,30 @@ import {
   Button,
   ButtonIcon,
   ButtonText,
-  Icon,
   Image,
-  Input,
-  InputField,
   ScrollView,
   Text,
-  View,
+  View
 } from "@gluestack-ui/themed";
 import { useRouter } from "expo-router";
-import { ChevronLeft, Search } from "lucide-react-native";
+import { ChevronLeft } from "lucide-react-native";
 import React from "react";
-import { LinearGradient } from "expo-linear-gradient";
 
 const index = () => {
   const router = useRouter();
   return (
-    <View style={{ backgroundColor: "#69b4ff" }}>
+    <View style={{ backgroundColor: "#2E8B57" }}>
 
       <ScrollView
         style={{
-          marginTop: 60,
+          marginTop: 45,
           backgroundColor: "#f7f7f7",
         }}
       >
         <View style={{ backgroundColor: "#f7f7f7" }}>
           <View
             style={{
-              backgroundColor: "#69b4ff" ,
+              backgroundColor: "#2E8B57" ,
               borderBottomLeftRadius: 30,
               borderBottomRightRadius: 30,
               paddingBottom: 20,
@@ -49,14 +45,12 @@ const index = () => {
             >
               <Box display="flex" flexDirection="column">
                 <Text
-                  // fontFamily="Poppins_700Bold"
                   color="#fff"
                   style={{ fontWeight: "bold", fontSize: 18 }}
                 >
                   Good Morning, Đatprs
                 </Text>
                 <Text
-                  // fontFamily="Poppins_400Regular_Italic"
                   style={{
                     fontStyle: "italic",
                     fontSize: 14,
@@ -80,7 +74,7 @@ const index = () => {
                 />
               </Box>
             </Box>
-            <Box
+            {/* <Box
               display="flex"
               flexDirection="row"
               justifyContent="center"
@@ -122,7 +116,7 @@ const index = () => {
                   />
                 </Input>
               </Box>
-            </Box>
+            </Box> */}
           </View>
         </View>
         <View
@@ -142,7 +136,6 @@ const index = () => {
             alignItems="center"
           >
             <Text
-              // fontFamily="Poppins_700Bold"
               style={{
                 fontSize: 24,
                 color: "#000",
@@ -177,7 +170,6 @@ const index = () => {
             </Button>
           </Box>
           <Text
-            // fontFamily="Poppins_400Regular_Italic"
             style={{
               marginTop: 10,
               fontSize: 16,

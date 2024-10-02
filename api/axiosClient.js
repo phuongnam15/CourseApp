@@ -1,7 +1,7 @@
 import axios from "axios";
 import * as SecureStore from 'expo-secure-store';
 const axiosClient = axios.create({
-  baseURL: 'https://learning-api.daominhtu.com/api/',
+  baseURL: 'https://learning.amaiagency.com/api',
   paramsSerializer: {
     serialize: (params) => {
       return new URLSearchParams(params).toString();

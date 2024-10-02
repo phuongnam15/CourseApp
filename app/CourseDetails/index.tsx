@@ -1,3 +1,5 @@
+import Notification from "@/components/components/Notification";
+import { useGlobalState } from "@/context/globalContext";
 import {
   Box,
   Button,
@@ -7,14 +9,16 @@ import {
   ScrollView,
   Text,
   View,
+  useToast,
 } from "@gluestack-ui/themed";
 import { useRouter } from "expo-router";
 import { ChevronLeftCircle, Star } from "lucide-react-native";
 import React from "react";
 import { StyleSheet, TouchableOpacity } from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
 
 const index = () => {
+  const {isLogin} = useGlobalState();
+  const toast = useToast();
   const router = useRouter();
   return (
     <View style={{ position: "relative" }}>
@@ -32,7 +36,7 @@ const index = () => {
             paddingRight: 30,
             paddingBottom: 15,
             backgroundColor: "#e7f1f5",
-            marginTop: 60,
+            marginTop: 45,
             position: "relative",
             display: "flex",
             flexDirection: "row",
@@ -53,7 +57,6 @@ const index = () => {
             <Icon as={ChevronLeftCircle} size="xl" />
           </TouchableOpacity>
           <Text
-            // fontFamily="Poppins_700Bold"
             style={{
               fontWeight: "bold",
               fontSize: 24,
@@ -83,7 +86,6 @@ const index = () => {
               fontSize={24}
               fontWeight="bold"
               textTransform="uppercase"
-              // fontFamily="Poppins_600SemiBold"
               style={{
                 lineHeight: 35 * 0.75,
                 paddingTop: 35 - 35 * 0.75,
@@ -96,7 +98,6 @@ const index = () => {
               <Text
                 ml={3}
                 style={{ fontSize: 12 }}
-                // fontFamily="Poppins_600SemiBold"
               >
                 4.9 (2000+)
               </Text>
@@ -104,10 +105,9 @@ const index = () => {
           </Box>
           <Text>Phan Lâm - 20 giờ học - 20 bài giảng</Text>
           <Text
-            // fontFamily="Poppins_600SemiBold"
             style={{
               fontSize: 24,
-              color: "#56b7ea",
+              color: "#61bc84",
               lineHeight: 35 * 0.75,
               paddingTop: 35 - 35 * 0.75,
             }}
@@ -115,7 +115,6 @@ const index = () => {
             299.999đ
           </Text>
           <Text
-            // fontFamily="Poppins_600SemiBold"
             style={{
               marginTop: 10,
               fontWeight: "bold",
@@ -126,7 +125,6 @@ const index = () => {
             Mô tả
           </Text>
           <Text
-            // fontFamily="Poppins_400Regular"
             style={{
               fontSize: 12,
               color: "#000",
@@ -172,7 +170,24 @@ const index = () => {
 
       <Button
         onPress={() => {
-          router.push("/Checkout/");
+          if(isLogin){
+            router.push("/Checkout/");
+          }else{
+            toast.show({
+              placement: "top",
+              render: ({ id }) => {
+                const toastId = "toast-" + id;
+                return (
+                  <Notification
+                    id={toastId}
+                    description="Bạn cần đăng nhập để tiếp tục"
+                    color="error"
+                    title="Lỗi"
+                  />
+                );
+              },
+            });
+          }
         }}
         size="md"
         variant="solid"
@@ -188,7 +203,7 @@ const index = () => {
           right: 20,
         }}
         display="flex"
-        backgroundColor="#56b7ea"
+        backgroundColor="#61bc84"
         justifyContent="center"
         alignItems="center"
       >
